@@ -1,0 +1,130 @@
+<?php
+/**
+ * @file
+ * Signature Field module.
+ */
+
+/**
+ * get list of modules and inlclude elements as required.
+ */
+foreach (module_list() as $module) {
+  if (file_exists($file = dirname(__FILE__) . "/includes/{$module}.inc")) {
+    require_once $file;
+  }
+}
+
+
+/**
+ * Converts SignatureField json string to a png image
+ */
+function signaturefield_json_to_image($element, $json) {
+  $src_image = imagecreatetruecolor($element['#width'] * 12, $element['#height'] * 12);
+  $color = _signaturefield_hex2rgb($element['#color']);
+  $bg = imagecolorallocatealpha($src_image, 0, 0, 0, 127);
+  $pen = imagecolorallocate($src_image, $color[0], $color[1], $color[2]);
+  imagefill($src_image, 0, 0, $bg);
+
+  $json = is_string($json) ? json_decode($json) : $json;
+
+  foreach ($json as $coord) {
+    signaturefield_drawline($src_image, $coord->lx * 12, $coord->ly * 12, $coord->mx * 12, $coord->my * 12, $pen, 2 * (12 / 2));
+  }
+
+  // Preserve transparency settings.
+  imagealphablending($src_image, TRUE);
+  imagesavealpha($src_image, TRUE);
+
+  $dest_image = imagecreatetruecolor($element['#width'], $element['#height']);
+
+  $bg = imagecolorallocatealpha($dest_image, 0, 0, 0, 127);
+  imagefill($dest_image, 0, 0, $bg);
+
+  // Preserve transparency settings.
+  imagealphablending($dest_image, TRUE);
+  imagesavealpha($dest_image, TRUE);
+
+  imagecopyresampled($dest_image, $src_image, 0, 0, 0, 0, $element['#width'], $element['#width'], $element['#width'] * 12, $element['#width'] * 12);
+
+  imagedestroy($src_image);
+  $dir = drupal_realpath(file_default_scheme() . '://signaturefield/');
+
+  if (file_prepare_directory($dir, FILE_CREATE_DIRECTORY)) {
+    $filepath = "{$dir}/" . time() . rand(1000, 9999) . '.png';
+    imagepng($dest_image, $filepath);
+    imagedestroy($dest_image);
+
+    return serialize(
+      array(
+      'json' => json_encode($json),
+      'filepath' => $filepath,
+    )
+    );
+  }
+
+  return FALSE;
+}
+
+/**
+ * Draws a thick line
+ * Changing the thickness of a line using imagesetthickness doesn't produce as nice of result
+ *
+ * @param object $src_image
+ * @param int $startX
+ * @param int $startY
+ * @param int $endX
+ * @param int $endY
+ * @param object $colour
+ * @param int $thickness
+ *
+ * @return void
+ */
+function signaturefield_drawline($src_image, $startX, $startY, $endX, $endY, $color, $thickness) {
+  $angle = (atan2(($startY - $endY), ($endX - $startX)));
+
+  $dist_x = $thickness * (sin($angle));
+  $dist_y = $thickness * (cos($angle));
+
+  $x1 = ceil(($startX + $dist_x));
+  $y1 = ceil(($startY + $dist_y));
+  $x2 = ceil(($endX + $dist_x));
+  $y2 = ceil(($endY + $dist_y));
+  $x3 = ceil(($endX - $dist_x));
+  $y3 = ceil(($endY - $dist_y));
+  $x4 = ceil(($startX - $dist_x));
+  $y4 = ceil(($startY - $dist_y));
+
+  $array = array($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4);
+  imagefilledpolygon($src_image, $array, (count($array) / 2), $color);
+}
+
+/**
+ *  Convert a hex color representation to it's rgb integer components.
+ *
+ *  @param $hex
+ *    Hex representation of the color.
+ *    Can be in the formats: '#ABC','ABC','#AABBCC','AABBCC'
+ *  @return
+ *    Array with three components RGB.
+ */
+function _signaturefield_hex2rgb($hex) {
+  $r = $g = $b = '';
+
+  $hex = ltrim($hex, '#');
+  if (preg_match('/^[0-9a-f]{3}$/i', $hex)) {
+    // 'FA3' is the same as 'FFAA33' so r=FF, g=AA, b=33
+    $r = str_repeat($hex{0}, 2);
+    $g = str_repeat($hex{1}, 2);
+    $b = str_repeat($hex{2}, 2);
+  }
+  elseif (preg_match('/^[0-9a-f]{6}$/i', $hex)) {
+    // #FFAA33 or r=FF, g=AA, b=33
+    $r = drupal_substr($hex, 0, 2);
+    $g = drupal_substr($hex, 2, 2);
+    $b = drupal_substr($hex, 4, 2);
+  }
+
+  $r = hexdec($r);
+  $g = hexdec($g);
+  $b = hexdec($b);
+  return array($r, $g, $b);
+}

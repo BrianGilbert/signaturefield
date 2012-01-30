@@ -1,0 +1,11 @@
+name = Signature Field
+description = SignatureField allows you to collect HTML5 canvas based signatures in webform, cck and in your custom modules via fapi
+dependencies[] = libraries
+core = 7.x
+
+files[] = signaturefield.module
+files[] = modules/content.inc
+files[] = modules/help.inc
+files[] = modules/system.inc
+files[] = modules/webform.inc
+files[] = templates/signaturefield.tpl.php
