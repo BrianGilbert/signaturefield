@@ -10,8 +10,6 @@
  * Defines the database schema of the field, using the format used by the
  * Schema API.
  *
- * The data we will store here is just one 7-character element, even
- * though the widget presents the three portions separately.
  *
  * All implementations of hook_field_schema() must be in the module's
  * .install file.
@@ -21,12 +19,14 @@
  * @see hook_field_schema()
  * @ingroup field_example
  */
-function field_example_field_schema($field) {
+function signaturefield_field_schema($field) {
   $columns = array(
-    'rgb' => array('type' => 'varchar', 'length' => 7, 'not null' => FALSE),
+    'color' => array('type' => 'varchar', 'length' => 7, 'not null' => FALSE),
+    'width' => array('type' => 'varchar', 'length' => 3, 'not null' => FALSE),
+    'height' => array('type' => 'varchar', 'length' => 2, 'not null' => FALSE),
   );
   $indexes = array(
-    'rgb' => array('rgb'),
+    'color' => array('color'),
   );
   return array(
     'columns' => $columns,

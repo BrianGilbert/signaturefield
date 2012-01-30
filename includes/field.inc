@@ -20,9 +20,7 @@ function signaturefield_field_info() {
       // A description of what type of data the field stores.
       'description' => t('Store a signature in the database.'),
       'default_widget' => 'signaturefield_default',
-      'default_formatter' => '  switch ($display['type']) {
-    // This formatter simply outputs the field as text and with a color.
-    case 'field_example_simple_text':',
+      'default_formatter' => 'signaturefield',
     ),
   );
 }
