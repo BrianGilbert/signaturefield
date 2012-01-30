@@ -55,7 +55,7 @@ function signaturefield_field_validate($entity_type, $entity, $field, $instance,
  * the form API flag an error when required fields are empty.
  */
 function signaturefield_field_is_empty($item, $field) {
-  return empty($item['value']);
+  return empty($item['data']);
 }
 
 /**
@@ -94,20 +94,16 @@ function signaturefield_field_formatter_info() {
  */
 function signaturefield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
-
   switch ($display['type']) {
     // This formatter simply outputs the field as text and with a color.
     case 'signaturefield_formatter':
+
       foreach ($items as $delta => $item) {
         $element[$delta] = array(
-          // We create a render array to produce the desired markup,
-          // "<p style="color: #hexcolor">The color code ... #hexcolor</p>".
-          // See theme_html_tag().
-          '#type' => 'signaturefield',
-          '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : NULL,
-          '#color' => isset($field['color']) ? $field['color'] : '#000',
-          '#width' => isset($field['width']) ? $field['width'] : 200,
-          '#height' => isset($field['height']) ? $field['height'] : 55,
+          '#markup' => theme('signaturefield_display', array(
+            'data' => $item['data'],
+            'settings' => $instance['widget']['settings'],
+          )),
         );
       }
     break;
@@ -211,13 +207,13 @@ function signaturefield_field_widget_form(&$form, &$form_state, $field, $instanc
 
   $widget += array(
     '#type' => 'signaturefield',
-    '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : NULL,
-    '#color' => isset($field['color']) ? $field['color'] : '#000',
-    '#width' => isset($field['width']) ? $field['width'] : 200,
-    '#height' => isset($field['height']) ? $field['height'] : 55,
+    '#default_value' => isset($items[$delta]['data']) ? $items[$delta]['data'] : NULL,
+    '#color' => isset($instance['widget']['settings']['color']) ? $instance['widget']['settings']['color'] : '#000',
+    '#width' => isset($instance['widget']['settings']['width']) ? $instance['widget']['settings']['width'] : 200,
+    '#height' => isset($instance['widget']['settings']['height']) ? $instance['widget']['settings']['height'] : 55,
   );
 
-  $element['signaturefield'] = $widget;
+  $element['data'] = $widget;
   return $element;
 }
 

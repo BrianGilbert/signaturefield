@@ -3,7 +3,6 @@
  * @file
  * Signaturefield element template file
  */
- dpm($element);
 ?>
 <label for="<?php echo $element['#id'] ?>"><?php echo $element['#title'] ?></label>
 <p class='drawItDesc'></p>

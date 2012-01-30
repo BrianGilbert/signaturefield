@@ -25,7 +25,7 @@ function signaturefield_webform_component_info() {
       'group' => FALSE,
       'attachment' => TRUE,
     ),
-    'file' => 'modules/webform.inc',
+    'file' => 'includes/webform.inc',
   );
 
   return $components;
@@ -49,7 +49,6 @@ function _webform_edit_signaturefield($component) {
   $form = array();
   // Disabling the description if not wanted.
   $form['description'] = array();
-
   // Most options are stored in the "extra" array, which stores any settings
   // unique to a particular component type.
   $form['extra']['color'] = array(
@@ -145,7 +144,14 @@ function _webform_display_signaturefield($component, $value, $format = 'html') {
   return array(
     '#title' => $component['name'],
     '#weight' => $component['weight'],
-    '#theme' => 'signaturefield_display',
+    '#markup' => theme('signaturefield_display', array(
+      'data' => $value['0'],
+      'settings' => array(
+        'color' => $component['extra']['color'],
+        'width' => $component['extra']['width'],
+        'height' => $component['extra']['height'],
+        ),
+    )),
     '#theme_wrappers' => $format == 'html' ? array('webform_element') : array('webform_element_text'),
     '#post_render' => array('webform_element_wrapper'),
     '#component' => $component,

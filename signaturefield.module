@@ -55,9 +55,9 @@ function signaturefield_json_to_image($element, $json) {
 
     return serialize(
       array(
-      'json' => json_encode($json),
-      'filepath' => $filepath,
-    )
+        'json' => json_encode($json),
+        'filepath' => str_replace($dir, file_default_scheme() . '://signaturefield/', $filepath),
+      )
     );
   }
 

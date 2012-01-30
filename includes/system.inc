@@ -16,7 +16,10 @@ function signaturefield_theme() {
     'render element' => 'element',
   );
   $items['signaturefield_display'] = array(
-    'render element' => 'element',
+    'variables' => array(
+      'data' => NULL,
+      'settings' => array(),
+    ),
   );
 
   drupal_alter('signaturefield_theme', $items);
@@ -110,7 +113,7 @@ function signaturefield_preprocess_signaturefield(&$vars) {
  * @todo Please document this function.
  * @see http://drupal.org/node/1354
  */
-function theme_signaturefield_display($element) {
-  $values = unserialize(is_array($element) && !empty($element['#value']) ? $element['#value'] : $element);
-  return theme('image', $values['filepath']);
+function theme_signaturefield_display($vars) {
+  $values = unserialize(is_array($vars) && !empty($vars['data']) ? $vars['data'] : $vars);
+  return theme('image', array('path' => $values['filepath']));
 }
