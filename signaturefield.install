@@ -25,11 +25,7 @@ function signaturefield_field_schema($field) {
     'width' => array('type' => 'varchar', 'length' => 3, 'not null' => FALSE),
     'height' => array('type' => 'varchar', 'length' => 2, 'not null' => FALSE),
   );
-  $indexes = array(
-    'color' => array('color'),
-  );
   return array(
     'columns' => $columns,
-    'indexes' => $indexes,
   );
 }

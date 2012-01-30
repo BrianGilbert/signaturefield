@@ -28,7 +28,7 @@ function signaturefield_theme() {
  * Implements hook_form_alter().
  */
 function signaturefield_form_alter(&$form, &$form_state, $form_id) {
-  drupal_alter('signaturefield_form_alter', &$form, &$form_state, $form_id);
+  drupal_alter('signaturefield_form_alter', $form, $form_state, $form_id);
 }
 
 /**
@@ -74,8 +74,8 @@ function signaturefield_after_build($element, $form_state) {
   drupal_add_html_head("<!--[if gte IE 7]><script type='text/javascript' src='{$libpath}/assets/excanvas-r71.min.js'></script><![endif]-->
   <!--[if IE 6]><script type='text/javascript' src='{$libpath}/assets/excanvas-r3.min.js'></script><![endif]-->", $key = NULL);
 
-  drupal_add_js("{$libpath}/assets/jquery.signaturepad.min.js");
-  drupal_add_js("{$libpath}/assets/json2.min.js");
+  drupal_add_js("{$libpath}/build/jquery.signaturepad.min.js");
+  drupal_add_js("{$libpath}/build/json2.min.js");
   drupal_add_js("{$modpath}/signaturefield.js");
 
   drupal_add_js(array(

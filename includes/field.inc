@@ -20,7 +20,7 @@ function signaturefield_field_info() {
       // A description of what type of data the field stores.
       'description' => t('Store a signature in the database.'),
       'default_widget' => 'signaturefield_default',
-      'default_formatter' => 'signaturefield',
+      'default_formatter' => 'signaturefield_formatter',
     ),
   );
 }
@@ -67,7 +67,7 @@ function signaturefield_field_is_empty($item, $field) {
  *
  * @see signaturefield_field_formatter_view()
  */
-function field_example_field_formatter_info() {
+function signaturefield_field_formatter_info() {
   return array(
     // The machine name of the formatter.
     'signaturefield_formatter' => array(
@@ -97,7 +97,7 @@ function signaturefield_field_formatter_view($entity_type, $entity, $field, $ins
 
   switch ($display['type']) {
     // This formatter simply outputs the field as text and with a color.
-    case 'signaturefield':
+    case 'signaturefield_formatter':
       foreach ($items as $delta => $item) {
         $element[$delta] = array(
           // We create a render array to produce the desired markup,
@@ -110,7 +110,6 @@ function signaturefield_field_formatter_view($entity_type, $entity, $field, $ins
           '#height' => isset($field['height']) ? $field['height'] : 55,
         );
       }
-    }
     break;
   }
 
@@ -136,7 +135,7 @@ function signaturefield_field_widget_info() {
   return array(
     // The machine name of the widget, no more than 32
     // characters.
-    'signaturefield_widget' => array(
+    'signaturefield_default' => array(
       // The human-readable label of the field that will be
       // seen in the Manage fields screen.
       'label' => t('Signature field widget'),
@@ -145,6 +144,44 @@ function signaturefield_field_widget_info() {
       'field types' => array('signaturefield'),
     ),
   );
+}
+
+/**
+ * Implements hook_field_widget_settings_form().
+ */
+function signaturefield_field_widget_settings_form($field, $instance) {
+  $widget = $instance['widget'];
+  $settings = $widget['settings'];
+
+  $form = array();
+    $form['color'] = array(
+      '#type' => 'textfield',
+      '#maxlength' => 7,
+      '#size' => 7,
+      '#title' => t('Color'),
+      '#default_value' => $settings['color'],
+      '#required' => FALSE,
+      '#description' => t('Hex code for pen color (default is black)'),
+    );
+    $form['width'] = array(
+      '#type' => 'textfield',
+      '#maxlength' => 3,
+      '#size' => 3,
+      '#title' => t('Width'),
+      '#default_value' => $settings['width'],
+      '#required' => FALSE,
+      '#description' => t('Custom width in pixels'),
+    );
+    $form['height'] = array(
+      '#type' => 'textfield',
+      '#maxlength' => 2,
+      '#size' => 2,
+      '#title' => t('Height'),
+      '#default_value' => $settings['height'],
+      '#required' => FALSE,
+      '#description' => t('Custom height in pixels'),
+    );
+  return $form;
 }
 
 /**
@@ -166,7 +203,7 @@ function signaturefield_field_widget_info() {
  * handler that converts our r, g, and b fields into a simulated single
  * 'rgb' form element.
  */
-function field_example_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+function signaturefield_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $value = isset($items[$delta]['signaturefield']) ? $items[$delta]['signaturefield'] : '';
 
   $widget = $element;
